@@ -1,5 +1,8 @@
 package com.simplilearn.web.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,25 +18,29 @@ public class SearchController {
 
 	@Autowired
 	SearchService service;
+	private static Logger logger = LoggerFactory.getLogger(SearchController.class);
 
 	@RequestMapping(value = "/usersearch", method = RequestMethod.GET)
 	public String showSearchUser(ModelMap model) {
-		System.out.println("Inside showSearchUser fileName = SearchController.java");
+		logger.info("Inside search User");
 		model.addAttribute("userSearch", new UserEntity());
 		return "usersearch";
 	}
 
 	@RequestMapping(value = "/usersearch", method = RequestMethod.POST)
 	public String processSearchUser(@ModelAttribute("userSearch") UserEntity user, ModelMap model) {
-		System.out.println("Inside processSearchUser fileName = SearchController.java");
+		logger.info("Inside processSearchUser fileName = SearchController.java");
 		if (user.getUsername() != "") {
 			boolean userExist = service.searchUser(user);
 			if (userExist) {
 				return "redirect:useredit";
 			} else {
+				logger.warn("USER NOT FOUND");
 				return "usernotfound";
 			}
 		}
+		
+		logger.warn("BLANK USERNAME DETECTED, USERNAME CANNOT BE BLANK");
 		model.addAttribute("search", "username field cannot be blank");
 		return "usersearch";
 	}
